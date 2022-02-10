@@ -1,0 +1,44 @@
+﻿using System.Collections;
+using System.Linq;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PierreManagerAI : MonoBehaviour
+{
+    private List<PierreAI> catFaction = new List<PierreAI>();
+    private List<PierreAI> dogFaction = new List<PierreAI>();
+    private List<PierreAI> lizardFaction = new List<PierreAI>();
+
+    public void addToFactions(PierreAI entity, string factions)
+    {
+        if (factions.Contains(PierreFactionType.catFaction))
+            catFaction.Add(entity);
+        if (factions.Contains(PierreFactionType.dogFaction))
+            dogFaction.Add(entity);
+        if (factions.Contains(PierreFactionType.lizardFaction))
+            lizardFaction.Add(entity);
+    }
+
+    public List<PierreAI> getEnemies(string factions)
+    {
+        List<PierreAI> e = new List<PierreAI>();
+
+        if (!factions.Contains(PierreFactionType.catFaction))
+            e.AddRange(catFaction);
+        if (!factions.Contains(PierreFactionType.dogFaction))
+            e.AddRange(dogFaction);
+        if (!factions.Contains(PierreFactionType.lizardFaction))
+            e.AddRange(lizardFaction);
+        return e;
+    }
+
+    public List<PierreAI> getAllAI()
+    {
+        List<PierreAI> list = new List<PierreAI>();
+        list.AddRange(catFaction);
+        list.AddRange(dogFaction);
+        list.AddRange(lizardFaction);
+        return list;
+    }
+
+}

@@ -1,0 +1,96 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(Animator))]
+
+public class PlayerScript : MonoBehaviour
+{
+    public PierreManagerAI MAI;
+
+    
+
+    public CharacterController characterController;
+    public Animator anim;
+    Vector3 direction;
+    float turnSmoothVelocity;
+    public int health = 100;
+    public bool downLoop = false;
+    public bool catFaction = false;
+    public bool dogFaction = false;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        characterController = GetComponent<CharacterController>();
+        direction = new Vector3(0, 0, 1);
+        anim = GetComponent<Animator>();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (!anim.GetBool("attacking") && !anim.GetBool("dying"))
+        {
+            Movements();
+        }
+        if(health < 1)
+        {
+            anim.SetBool("dying", true);
+            anim.SetBool("moving", false);
+            anim.SetBool("attacking", false);
+        }
+        if (!anim.GetBool("moving") && !anim.GetBool("dying"))
+        {
+            Attack();
+        }
+    }
+
+    private void Movements()
+    {
+        float dx = Input.GetAxis("Horizontal");
+        float dz = Input.GetAxis("Vertical");
+
+        float speed = dx * dx + dz * dz;
+
+        direction.Set(dx, 0, dz);
+        direction.Normalize();
+
+        if (direction.magnitude > 0.1)
+        {
+            anim.SetBool("moving", true);
+            anim.SetBool("attacking", false);
+            anim.SetBool("dying", false);
+
+            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, 0.1f);
+            transform.rotation = Quaternion.Euler(0f, angle, 0f);
+            characterController.Move(5.0f * direction * Time.deltaTime);
+        } else
+        {
+            anim.SetBool("moving", false);
+            anim.SetBool("attacking", false);
+            anim.SetBool("dying", false);
+        }
+    }
+
+    private void Attack()
+    {
+        if (Input.GetKey("e"))
+        {
+            Debug.Log("e");
+            anim.SetBool("attacking", true);
+            anim.SetBool("moving", false);
+            anim.SetBool("dying", false);
+        }
+        else
+        {
+            anim.SetBool("attacking", false);
+            anim.SetBool("moving", false);
+            anim.SetBool("dying", false);
+        }
+    }
+
+
+}

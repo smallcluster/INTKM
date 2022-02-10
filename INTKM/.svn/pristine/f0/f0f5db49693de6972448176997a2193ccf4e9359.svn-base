@@ -1,0 +1,10 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+
+public static class PierreFactionType
+{
+    public const string dogFaction = "D";
+    public const string catFaction = "C";
+    public const string lizardFaction = "L";
+    public const string playerFaction = "P";
+}

@@ -1,0 +1,70 @@
+﻿using System.Collections;
+using System.Linq;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PierreManagerAI : MonoBehaviour
+{
+    /*
+    private List<PierreAI> catFaction = new List<PierreAI>();
+    private List<PierreAI> dogFaction = new List<PierreAI>();
+    private List<PierreAI> lizardFaction = new List<PierreAI>();
+    */
+
+    private List<PierreAI> entities = new List<PierreAI>();
+
+    [System.Obsolete("Old function, please use AddAI instead", true)]
+    public void addToFactions(PierreAI entity, string factions)
+    {
+        entities.Add(entity);
+
+        /*
+        if (factions.Contains(PierreFactionType.catFaction))
+            catFaction.Add(entity);
+        if (factions.Contains(PierreFactionType.dogFaction))
+            dogFaction.Add(entity);
+        if (factions.Contains(PierreFactionType.lizardFaction))
+            lizardFaction.Add(entity);
+        */
+    }
+
+    public void AddAI(PierreAI entity)
+    {
+        entities.Add(entity);
+    }
+
+    public List<PierreAI> getEnemies(string factions)
+    {
+        
+        List<PierreAI> e = new List<PierreAI>();
+
+        //foreach(PierreAI ai in entities)
+        //{
+        //    string aiFactions = ai.GetFactions();
+        //    if (aiFactions.Contains(PierreFactionType.catFaction) && factions.Contains(PierreFactionType.catFaction))
+        //        continue;
+        //    if (aiFactions.Contains(PierreFactionType.dogFaction) && factions.Contains(PierreFactionType.dogFaction))
+        //        continue;
+        //    if (aiFactions.Contains(PierreFactionType.lizardFaction) && factions.Contains(PierreFactionType.lizardFaction))
+        //        continue;
+        //    e.Add(ai);
+        //}
+
+        /*
+        if (!factions.Contains(PierreFactionType.catFaction))
+            e.AddRange(catFaction);
+        if (!factions.Contains(PierreFactionType.dogFaction))
+            e.AddRange(dogFaction);
+        if (!factions.Contains(PierreFactionType.lizardFaction))
+            e.AddRange(lizardFaction);
+        */
+
+        return e;
+    }
+
+    public List<PierreAI> getAllAI()
+    {
+        return entities;
+    }
+
+}

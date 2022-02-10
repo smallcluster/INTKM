@@ -1,0 +1,167 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+
+[RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(Animator))]
+
+public class PierreAI : MonoBehaviour
+{
+    public PierreManagerAI MAI;
+    
+    // Editor helper only
+    public bool catFaction = false;
+    public bool dogFaction = false;
+    public bool lizardFaction = false;
+    // ------------------------------------
+
+    private float turnSmoothTime = 0.1f;
+    private float turnSmoothVelocity;
+
+    private float speed = 3.0f;
+
+    private bool activated = false;
+
+    private const int maxPredators = 2;
+
+    private CharacterController characterController;
+    private Animator animator;
+
+    private bool dead = false;
+
+    private int predators = 0;
+
+    private PierreAI target = null;
+
+    private string factions = "";
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        if (catFaction) factions += PierreFactionType.catFaction;
+        if (dogFaction) factions += PierreFactionType.dogFaction;
+        if (lizardFaction) factions += PierreFactionType.lizardFaction;
+
+        MAI.addToFactions(this, factions);
+        characterController = GetComponent<CharacterController>();
+        animator = GetComponent<Animator>();
+    }
+
+
+    public bool isDead() { return dead; }
+    public bool isTargetable() { return predators < maxPredators && !dead; }
+
+    public void beTargeted()
+    {
+        if (predators < maxPredators) predators++;
+    }
+
+    public void untarget()
+    {
+        if (predators > 0) predators--;
+    }
+
+    private void updateTarget()
+    {
+        if (target != null) target.untarget();
+        target = null;
+
+        List<PierreAI> enemies = MAI.getEnemies(factions);
+
+
+        if (enemies.Count == 0) return;
+
+        // get the first targetable enemy
+        PierreAI closest = null;
+
+        foreach (PierreAI e in enemies)
+        {
+            if (e.isTargetable())
+            {
+                e.beTargeted();
+                closest = e;
+                break;
+            }
+        }
+
+
+        // no target possible -> exit
+        if (closest == null) return;
+
+    
+        float d = (closest.transform.position - transform.position).sqrMagnitude;
+        // find the closest enemy
+        foreach (PierreAI e in enemies)
+        {
+            if (e.isTargetable())
+            {
+                float dd = (e.transform.position - transform.position).sqrMagnitude;
+                if (dd < d)
+                {
+                    e.beTargeted();
+                    closest.untarget();
+                    d = dd;
+                    closest = e;
+                }
+            }
+        }
+        target = closest;
+    } 
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.P)) activated = true;
+        if (!activated) return;
+
+        updateTarget();
+        if(target != null)
+        {
+            animator.SetBool("moving", true);
+
+            Vector3 direction = (target.transform.position - transform.position);
+
+            direction.y = 0;
+            direction.Normalize();
+            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
+            transform.rotation = Quaternion.Euler(0f, angle, 0f);
+
+
+            List<PierreAI> list = MAI.getAllAI();
+
+            Vector3 flock = new Vector3(0, 0, 0);
+
+            foreach (PierreAI ai in list)
+            {
+                if(ai != target && ai != this)
+                {
+                    Vector3 dir = (ai.transform.position - transform.position);
+                    dir.y = 0;
+                    float force = 0.7f / dir.magnitude;
+                    dir.Normalize();
+                    flock -= dir * force;
+                }
+                
+            }
+
+            Vector3 moveVector;
+
+            if ((target.transform.position - transform.position).magnitude <= 1.2)
+            {
+                moveVector = flock;
+                animator.SetBool("moving", false);
+                animator.SetBool("attacking", true);
+            }
+            else
+                moveVector = direction * speed + flock;
+
+            characterController.Move(moveVector * Time.deltaTime);
+
+        } else
+        {
+            animator.SetBool("moving", false);
+        }
+    }
+}

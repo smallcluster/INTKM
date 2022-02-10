@@ -1,0 +1,40 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class SpawnEnemy : MonoBehaviour
+{
+    public Transform SpawnPoint1;
+    public Transform SpawnPoint2;
+    public Transform SpawnPoint3;
+    public Transform SpawnPoint4;
+    public GameObject Lezard;
+    public int secondsLeft = 10;
+    public bool takingAway;
+
+    void Start(){
+
+    }
+
+    void Update(){
+        if(takingAway == false && secondsLeft >0){
+            StartCoroutine(TimerTake());
+        }
+        else if(secondsLeft<1) {
+            Instantiate(Lezard, SpawnPoint1.position, SpawnPoint1.rotation);
+            Instantiate(Lezard, SpawnPoint2.position, SpawnPoint2.rotation);
+            Instantiate(Lezard, SpawnPoint3.position, SpawnPoint3.rotation);
+            Instantiate(Lezard, SpawnPoint4.position, SpawnPoint4.rotation);
+        }
+    }
+
+    IEnumerator TimerTake(){
+        takingAway = true;
+        yield return new WaitForSeconds(1);
+        secondsLeft -=1;
+        print(secondsLeft);
+        takingAway = false;
+    }
+    
+   
+}
